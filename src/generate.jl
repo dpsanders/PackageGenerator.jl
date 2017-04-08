@@ -13,9 +13,11 @@ These include:
 The package defaults to the "MIT" `license`. See `PkgDev` for other options.
 
 `ssh-keygen` is required. If it is not on your path, make sure to include
-a path to it. `ssh-keygen` is sometimes packaged with git. If you are on
+a path to it. `ssh-keygen` is sometimes packaged with `git`. If you are on
 Windows, `PackageGenerator` will automatically check
-"C:/Program Files/Git/usr/bin" for it.
+`"C:/Program Files/Git/usr/bin"` for it. If you are on Ubuntu, and don't
+yet have it installed, try `sudo apt-get install openssh-client`. Then you
+won't need to include a path.
 """
 generate(package;
     license = "MIT",
