@@ -1,17 +1,13 @@
 module PackageGenerator
 
-"""
-    test_function()
+import PkgDev
+import JSON
+import HTTP
 
-Return 1
-
-```jldoctest
-julia> import PackageGenerator
-
-julia> PackageGenerator.test_function()
-1
-```
-"""
-test_function() = 1
+include("utilities.jl")
+include("github.jl")
+include("travis.jl")
+include("texts.jl")
+include("generate.jl")
 
 end
