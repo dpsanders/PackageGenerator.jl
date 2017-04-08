@@ -18,6 +18,9 @@ Windows, `PackageGenerator` will automatically check
 `"C:/Program Files/Git/usr/bin"` for it. If you are on Ubuntu, and don't
 yet have it installed, try `sudo apt-get install openssh-client`. Then you
 won't need to include a path.
+
+For `LibGit2.push` to work, 
+follow the instructions [here](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) 
 """
 generate(package;
     license = "MIT",
