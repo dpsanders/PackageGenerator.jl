@@ -9,11 +9,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#PackageGenerator.test_function-Tuple{}",
+    "location": "index.html#PackageGenerator.generate-Tuple{Any}",
     "page": "Home",
-    "title": "PackageGenerator.test_function",
+    "title": "PackageGenerator.generate",
     "category": "Method",
-    "text": "test_function()\n\nReturn 1\n\njulia> import PackageGenerator\n\njulia> PackageGenerator.test_function()\n1\n\n\n\n"
+    "text": "generate(package; license = \"MIT\", path_to_ssh_keygen = \"\")\n\nGenerate a package named package with some nice bells and whistles. These include:\n\na matching github repository\nan activated repository on travis\ngenerated documentation that\nautomatically syncs to changes on github\nincludes doctests as part of your package testing suite\n\nThe package defaults to the \"MIT\" license. See PkgDev for other options.\n\nssh-keygen is required. If it is not on your path, make sure to include a path to it. ssh-keygen is sometimes packaged with git. If you are on Windows, PackageGenerator will automatically check \"C:/Program Files/Git/usr/bin\" for it.\n\n\n\n"
 },
 
 {
