@@ -16,10 +16,20 @@ sync_travis_to_github(user, token, repo_name) =
         activity = "Syncing travis to github",
         status_exceptions = [409] )
 
-get_travis_repo_info(user, token, repo_name) =
-    HTTP_wrapper(TRAVIS_URL, "/repos/$user/$repo_name",
-        token = token,
-        activity = "Getting travis repo info")
+get_travis_repo_info(user, token, repo_name; retry = 1, travis_sync_time = 20) =
+    try
+        HTTP_wrapper(TRAVIS_URL, "/repos/$user/$repo_name",
+            token = token,
+            activity = "Getting travis repo info")
+    catch x
+        if isa(x, UnicodeError) && retry > 0
+            info("Sync (probably) not complete, sleeping $travis_sync_time seconds and retrying")
+            sleep(travis_sync_time)
+            get_travis_repo_info(user, token, repo_name; retry = retry - 1, travis_sync_time = travis_sync_time)
+        else
+            error("(Probably) tried to access a travis repo that doesn't exist, maybe due to incomplete syning. Try raising the `travis_sync_time`")
+        end
+    end
 
 turn_on_travis_repo(token, repository_id) =
     HTTP_wrapper(TRAVIS_URL, "/hooks/$repository_id",

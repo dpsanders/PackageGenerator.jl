@@ -19,18 +19,18 @@ Windows, `PackageGenerator` will automatically check
 yet have it installed, try `sudo apt-get install openssh-client`. Then you
 won't need to include a path.
 
-For `LibGit2.push` to work, 
-follow the instructions [here](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) 
+For `LibGit2.push` to work,
+follow the instructions [here](https://help.github.com/articles/connecting-to-github-with-ssh/)
 """
 generate(package;
     license = "MIT",
     path_to_ssh_keygen = "",
+    travis_sync_time = 20,
     path = joinpath(Pkg.Dir.path(), package),
     authors = LibGit2.getconfig("user.name", ""),
     years = PkgDev.Generate.copyright_year(),
     user = PkgDev.GitHub.user(),
-    repo_name = string(package, ".jl"),
-    travis_sync_time = 10
+    repo_name = string(package, ".jl")
 ) = begin
 
     if endswith(package, ".jl")
@@ -92,7 +92,7 @@ end
 
 function set_up_linked_github_and_travis_accounts(user, repo_name;
     path_to_ssh_keygen = "",
-    travis_sync_time = 10)
+    travis_sync_time = 20)
 
     info("Getting github token")
     github_token = PkgDev.GitHub.token()
@@ -100,6 +100,7 @@ function set_up_linked_github_and_travis_accounts(user, repo_name;
 
     travis_token = get_travis_token(github_token)
     sync_travis_to_github(user, travis_token, repo_name)
+    info("Waiting $travis_sync_time seconds for travis to sync")
     sleep(travis_sync_time)
     repository_id = get_travis_repo_info(user, travis_token, repo_name)["id"]
     turn_on_travis_repo(travis_token, repository_id)

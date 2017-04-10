@@ -30,7 +30,8 @@ HTTP_wrapper(url_pieces...;
     body = "",
     activity = "",
     headers = Dict{String, String}(),
-    status_exceptions = []
+    status_exceptions = [],
+    retry = 1
 ) = begin
 
     if activity != ""
@@ -53,11 +54,18 @@ HTTP_wrapper(url_pieces...;
             headers = headers_and_token,
             body = body_string)
     catch x
-        if isa(x, HTTP.TimeoutException) && retry == 1
-            retry = 0
-            request(string(url_pieces...),
-                headers = headers_and_token,
-                body = body_string)
+        if isa(x, HTTP.TimeoutException) && retry > 0
+            info("Timeout; retrying")
+            return HTTP_wrapper(url_pieces...;
+                request = request,
+                token = token,
+                JSON_body = JSON_body,
+                body = body,
+                activity = activity,
+                headers = headers,
+                status_exceptions = status_exceptions,
+                retry = retry - 1
+            )
         else
             rethrow()
         end
