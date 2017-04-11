@@ -86,7 +86,16 @@ ssh_keygen() = mktempdir() do temp
     cd(temp) do
         info("Generating ssh key")
         filename = ".documenter"
-        if !success(`ssh-keygen -f $filename`)
+        succeded = try
+            success(`ssh-keygen -f $filename`)
+        catch x
+            if isa(x, Base.UVError)
+                error("Cannot find ssh-keygen. Try adding `path_to_ssh_keygen`")
+            else
+                rethrow()
+            end
+        end
+        if succeded
             error("Cannot generate ssh keys")
         end
         string(filename, ".pub") |> readstring,
