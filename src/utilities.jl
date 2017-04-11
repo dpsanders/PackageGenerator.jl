@@ -95,7 +95,7 @@ ssh_keygen() = mktempdir() do temp
                 rethrow()
             end
         end
-        if succeded
+        if !succeded
             error("Cannot generate ssh keys")
         end
         string(filename, ".pub") |> readstring,
