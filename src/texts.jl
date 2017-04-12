@@ -50,7 +50,7 @@ travis(package) =
       - linux
       - osx
     julia:
-      - release
+      - 0.5
       - nightly
     notifications:
       email: false
