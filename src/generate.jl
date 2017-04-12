@@ -76,6 +76,7 @@ generate(package;
             PkgDev.Generate.license(path, license, years, authors),
             PkgDev.Generate.require(path),
             PkgDev.Generate.codecov(path)
+            PkgDev.Generate.appveyor(path)
         ]
 
         info("Committing changes")
