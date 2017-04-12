@@ -48,6 +48,7 @@ travis(package) =
     language: julia
     os:
       - linux
+      - osx
     julia:
       - release
       - nightly
