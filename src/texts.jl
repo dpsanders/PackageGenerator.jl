@@ -55,10 +55,10 @@ travis(package) =
     notifications:
       email: false
     after_success:
-    # push coverage results to Codecov
-      - julia -e 'cd(Pkg.dir("$package")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
     # build documentation
       - julia -e 'cd(Pkg.dir("$package")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
+    # push coverage results to Codecov
+      - julia -e 'cd(Pkg.dir("$package")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
     """
 
 make(user, repo_name) =
@@ -111,10 +111,10 @@ entrypoint(package) =
     julia> import $package
 
     julia> $package.test_function()
-    1
+    2
     ```
     ""\"
-    test_function() = 2
+    test_function() = 1
 
     end
     """

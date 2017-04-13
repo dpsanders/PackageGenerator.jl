@@ -1,14 +1,43 @@
 """
-    create(package, license = "MIT")
+    PackageGenerator.generate_offline(package, license = "MIT")
 
-Create a package without any online features (github, travis, online
-documentation).
+Only the offline components of [`generate`](@ref) (see for more documentation)
+
+Create a local git repository containing package files.
 
 ```jldoctest
-    repo = create("TestRepo")
+julia> import PackageGenerator
+
+julia> package = "TestRepo";
+
+julia> path = joinpath(tempdir(), package);
+
+julia> PackageGenerator.generate_offline(package,
+          path = path, authors = "blah", user = "blah");
+
+julia> all([
+           ".codecov.yml",
+           ".git",
+           ".gitignore",
+           ".travis.yml",
+           "appveyor.yml",
+           "docs",
+           "LICENSE.md",
+           "README.md",
+           "REQUIRE",
+           "src/$package.jl",
+           "test/REQUIRE",
+           "test/runtests.jl",
+           "docs/.gitignore",
+           "docs/make.jl",
+           "docs/src/index.md"
+       ]) do file
+           joinpath(path, file) |> ispath
+       end
+true
 ```
 """
-create(package;
+generate_offline(package;
     path = joinpath(Pkg.Dir.path(), package),
     license = "MIT",
     authors = LibGit2.getconfig("user.name", ""),
@@ -62,20 +91,14 @@ create(package;
 end
 
 """
-    set_up_linked_github_and_travis_accounts(repo_name;
-        user = PkgDev.GitHub.user(),
-        ssh_keygen_file = "ssh-keygen"
-    )
+    PackageGenerator.generate_online(repo_name; ssh_keygen_file = "ssh-keygen")
 
-Set up a linked github and travis account for a certain repository. `user`
-defaults to the github user in your git settings.
+Only the online components of [`generate`](@ref) (see for more
+documentation)
 
-`ssh-keygen` makes a pair of keys that allow travis to
-communicate with github. For Windows users with git installed, try
-`ssh_keygen_path = "C:/Program Files/Git/usr/bin/ssh-keygen"`. For Linux users
-with git installed, the default should be fine.
+Set up a linked github and travis account for a certain repository.
 """
-set_up_linked_github_and_travis_accounts(repo_name;
+generate_online(repo_name;
     user = PkgDev.GitHub.user(),
     github_token = PkgDev.GitHub.token(),
     travis_token = get_travis_token(github_token),
@@ -98,7 +121,7 @@ set_up_linked_github_and_travis_accounts(repo_name;
 end
 
 """
-    generate(package; license = "MIT", ssh_keygen_file = "ssh-keygen")
+    PackageGenerator.generate(package; license = "MIT", ssh_keygen_file = "ssh-keygen")
 
 Generate a package named `package` with some nice bells and whistles.
 These include:
@@ -136,7 +159,7 @@ generate(package;
         error("Please provide package name without .jl")
     end
 
-    repo = create_package(package;
+    repo = generate_offline(package;
         path = path,
         license = license,
         authors = authors,
@@ -145,7 +168,7 @@ generate(package;
         repo_name = repo_name
     )
 
-    set_up_linked_github_and_travis_accounts(repo_name;
+    generate_online(repo_name;
         user = user,
         github_token = github_token,
         travis_token = travis_token,
