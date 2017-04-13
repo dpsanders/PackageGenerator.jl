@@ -53,7 +53,11 @@ HTTP_wrapper(url_pieces...;
     elseif status_number >= 300
         error("$status_number $status_text: $response_body")
     else
-        response_body |> JSON.Parser.parse
+        try
+            response_body |> JSON.parse
+        catch
+            response_body
+        end
     end
 end
 

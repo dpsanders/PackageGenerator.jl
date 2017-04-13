@@ -25,7 +25,7 @@ julia> all([
            "LICENSE.md",
            "README.md",
            "REQUIRE",
-           "src/$package.jl",
+           "src/\$package.jl",
            "test/REQUIRE",
            "test/runtests.jl",
            "docs/.gitignore",
@@ -134,7 +134,7 @@ These include:
 
 The package defaults to the "MIT" `license`. See `PkgDev` for other options.
 
-`ssh-keygen` makes a pair of keys that allow travis to
+`ssh-keygen` makes a pair of keys that allows travis to
 communicate with github. For Linux users with git installed, the default should
 be fine. For Windows users with git installed, try
 `ssh_keygen_path = "C:/Program Files/Git/usr/bin/ssh-keygen"`.
@@ -159,24 +159,29 @@ generate(package;
         error("Please provide package name without .jl")
     end
 
-    repo = generate_offline(package;
-        path = path,
-        license = license,
-        authors = authors,
-        years = years,
-        user = user,
-        repo_name = repo_name
-    )
+    try
+        repo = generate_offline(package;
+            path = path,
+            license = license,
+            authors = authors,
+            years = years,
+            user = user,
+            repo_name = repo_name
+        )
 
-    generate_online(repo_name;
-        user = user,
-        github_token = github_token,
-        travis_token = travis_token,
-        ssh_keygen_file = ssh_keygen_file,
-        travis_sync_time = travis_sync_time
-    )
+        generate_online(repo_name;
+            user = user,
+            github_token = github_token,
+            travis_token = travis_token,
+            ssh_keygen_file = ssh_keygen_file,
+            travis_sync_time = travis_sync_time
+        )
 
-    info("Pushing changes")
-    LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
-    return
+        info("Pushing changes")
+        LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
+    catch
+        rm(path, recursive = true)
+        delete_github_repo(user, github_token, repo_name)
+        rethrow()
+    end
 end
