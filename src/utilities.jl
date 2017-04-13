@@ -1,28 +1,3 @@
-path_separator() = if is_windows()
-    ";"
-else
-    ":"
-end
-
-path_check(path) =
-    if path == ""
-        ""
-    elseif ispath(path)
-        path_separator() * path
-    else
-        info("Cannot find $path")
-        ""
-    end
-
-platform_paths() = if is_windows()
-    ["C:/Program Files/Git/usr/bin"]
-else
-    []
-end
-
-add_to_path(path) =
-    "PATH" => string(ENV["PATH"], path_check.( vcat(platform_paths(), path) )...)
-
 HTTP_wrapper(url_pieces...;
     request = HTTP.get,
     token = "",
@@ -82,15 +57,15 @@ HTTP_wrapper(url_pieces...;
     end
 end
 
-ssh_keygen() = mktempdir() do temp
+ssh_keygen(path) = mktempdir() do temp
     cd(temp) do
         info("Generating ssh key")
         filename = ".documenter"
         succeded = try
-            success(`ssh-keygen -f $filename`)
+            success(`$path -f $filename`)
         catch x
             if isa(x, Base.UVError)
-                error("Cannot find ssh-keygen. Try adding `path_to_ssh_keygen`")
+                error("Cannot find ssh-keygen`")
             else
                 rethrow()
             end
