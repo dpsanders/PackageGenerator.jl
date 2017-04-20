@@ -44,52 +44,6 @@ export generate_offline
 Only the offline components of [`generate`](@ref) (see for more documentation)
 
 Create a local git repository containing package files.
-
-```jldoctest
-julia> using PackageGenerator
-
-julia> mktempdir() do base_path
-           package = "TestRepo"
-           path = joinpath(base_path, package)
-           generate_offline("TestRepo",
-               path = path, authors = "test user", user = "test_user", years = "some years")
-           all([
-               ".codecov.yml",
-               ".git",
-               ".gitignore",
-               ".travis.yml",
-               "appveyor.yml",
-               "docs",
-               "LICENSE.md",
-               "README.md",
-               "REQUIRE",
-               "src/\$package.jl",
-               "test/REQUIRE",
-               "test/runtests.jl",
-               "docs/.gitignore",
-               "docs/make.jl",
-               "docs/src/index.md"
-           ]) do file
-               joinpath(path, file) |> ispath
-           end
-       end
-INFO: Initializing git repository
-INFO: Generating src/TestRepo.jl
-INFO: Generating test/REQUIRE
-INFO: Generating docs/make.jl
-INFO: Generating docs/src/index.md
-INFO: Generating README.md
-INFO: Generating .travis.yml
-INFO: Generating test/runtests.jl
-INFO: Generating docs/.gitignore
-INFO: Generating .gitignore
-INFO: Generating LICENSE.md
-INFO: Generating REQUIRE
-INFO: Generating .codecov.yml
-INFO: Generating appveyor.yml
-INFO: Committing changes
-true
-```
 """
 generate_offline(package;
     path = joinpath(Pkg.Dir.path(), package),
