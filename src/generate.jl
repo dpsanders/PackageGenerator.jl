@@ -1,6 +1,6 @@
 export generate_online
 """
-    generate_online(repo_name; ssh_keygen_file = "ssh-keygen")
+    generate_online(repo_name; ssh_keygen_file = "ssh-keygen", appveyor_token = "")
 
 Only the online components of [`generate`](@ref) (see for more
 documentation)
