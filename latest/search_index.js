@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.generate_online",
     "category": "Method",
-    "text": "generate_online(repo_name; ssh_keygen_file = \"ssh-keygen\")\n\nOnly the online components of generate (see for more documentation)\n\nSet up a linked github and travis account for a certain repository.\n\n\n\n"
+    "text": "generate_online(repo_name; ssh_keygen_file = \"ssh-keygen\", appveyor_token = \"\")\n\nOnly the online components of generate (see for more documentation)\n\nSet up a linked github and travis account for a certain repository.\n\n\n\n"
 },
 
 {
