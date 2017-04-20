@@ -52,7 +52,7 @@ julia> mktempdir() do base_path
            package = "TestRepo"
            path = joinpath(base_path, package)
            generate_offline("TestRepo",
-               path = path, authors = "test user", user = "test_user")
+               path = path, authors = "test user", user = "test_user", years = "some years")
            all([
                ".codecov.yml",
                ".git",
