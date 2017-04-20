@@ -24,8 +24,6 @@ readme(user, package, repo_name;
 
     [documenter_stable]: https://$user.github.io/$repo_name/stable
     [documenter_latest]: https://$user.github.io/$repo_name/latest
-
-    https://ci.appveyor.com/project/bramtayl/chainmap-jl/settings/badges
     """
 
 tests(package, repo_name, authors) =
