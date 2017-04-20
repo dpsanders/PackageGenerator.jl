@@ -1,8 +1,11 @@
-readme(user, package, repo_name) =
+readme(user, package, repo_name;
+    appveyor_slug = default_appveyor_slug(repo_name)
+) =
     """
     # $package
 
     [![travis badge][travis_badge]][travis_url]
+    [![appveyor badge][appveyor_badge]][appveyor_url]
     [![codecov badge][codecov_badge]][codecov_url]
 
     ## Documentation
@@ -13,14 +16,19 @@ readme(user, package, repo_name) =
     [travis_badge]: https://travis-ci.org/$user/$repo_name.svg?branch=master
     [travis_url]: https://travis-ci.org/$user/$repo_name
 
+    [appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/$user/$repo_name?svg=true&branch=master
+    [appveyor_url]: https://ci.appveyor.com/project/$user/$appveyor_slug
+
     [codecov_badge]: http://codecov.io/github/$user/$repo_name/coverage.svg?branch=master
     [codecov_url]: http://codecov.io/github/$user/$repo_name?branch=master
 
     [documenter_stable]: https://$user.github.io/$repo_name/stable
     [documenter_latest]: https://$user.github.io/$repo_name/latest
+
+    https://ci.appveyor.com/project/bramtayl/chainmap-jl/settings/badges
     """
 
-tests(package, repo_name, authors) = begin
+tests(package, repo_name, authors) =
     """
     using $package
     using Base.Test
@@ -34,13 +42,13 @@ tests(package, repo_name, authors) = begin
         pages = Any["Home" => "index.md"],
         strict = true,
         linkcheck = true,
+        checkdocs = :exports,
         authors = "$authors"
     )
 
     # write your own tests here
     @test 1 == 1
     """
-end
 
 travis(package) =
     """

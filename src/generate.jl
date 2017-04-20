@@ -1,39 +1,93 @@
+export generate_online
 """
-    PackageGenerator.generate_offline(package, license = "MIT")
+    generate_online(repo_name; ssh_keygen_file = "ssh-keygen")
+
+Only the online components of [`generate`](@ref) (see for more
+documentation)
+
+Set up a linked github and travis account for a certain repository.
+"""
+generate_online(repo_name;
+    user = PkgDev.GitHub.user(),
+    github_token = PkgDev.GitHub.token(),
+    travis_token = get_travis_token(github_token),
+    appveyor_token = "",
+    sync_time = 60,
+    ssh_keygen_file = "ssh-keygen"
+) = begin
+
+    create_github_repo(github_token, repo_name)
+    info("Waiting $sync_time seconds to for github repo creation to finish")
+    sleep(sync_time)
+    sync_travis_to_github(user, travis_token)
+    info("Waiting $sync_time seconds to finish syncing travis to github")
+    sleep(sync_time)
+    repository_id = get_travis_repo_info(user, travis_token, repo_name)["id"]
+    turn_on_travis_repo(travis_token, repository_id)
+
+    public_key, private_key = ssh_keygen(ssh_keygen_file)
+    create_github_deploy_key(user, github_token, repo_name, "documenter", public_key)
+    create_travis_env_var(travis_token, repository_id, "DOCUMENTER_KEY", private_key)
+
+    if appveyor_token == ""
+        info("No appveyor token given; not turning on repository; guessing appveyor slug")
+        default_appveyor_slug(repo_name)
+    else
+        turn_on_appveyor_repo(user, appveyor_token, repo_name)
+    end
+end
+
+export generate_offline
+"""
+    generate_offline(package, license = "MIT")
 
 Only the offline components of [`generate`](@ref) (see for more documentation)
 
 Create a local git repository containing package files.
 
 ```jldoctest
-julia> import PackageGenerator
+julia> using PackageGenerator
 
-julia> package = "TestRepo";
-
-julia> path = joinpath(tempdir(), package);
-
-julia> PackageGenerator.generate_offline(package,
-          path = path, authors = "blah", user = "blah");
-
-julia> all([
-           ".codecov.yml",
-           ".git",
-           ".gitignore",
-           ".travis.yml",
-           "appveyor.yml",
-           "docs",
-           "LICENSE.md",
-           "README.md",
-           "REQUIRE",
-           "src/\$package.jl",
-           "test/REQUIRE",
-           "test/runtests.jl",
-           "docs/.gitignore",
-           "docs/make.jl",
-           "docs/src/index.md"
-       ]) do file
-           joinpath(path, file) |> ispath
+julia> mktempdir() do base_path
+           package = "TestRepo"
+           path = joinpath(base_path, package)
+           generate_offline("TestRepo",
+               path = path, authors = "test user", user = "test_user")
+           all([
+               ".codecov.yml",
+               ".git",
+               ".gitignore",
+               ".travis.yml",
+               "appveyor.yml",
+               "docs",
+               "LICENSE.md",
+               "README.md",
+               "REQUIRE",
+               "src/\$package.jl",
+               "test/REQUIRE",
+               "test/runtests.jl",
+               "docs/.gitignore",
+               "docs/make.jl",
+               "docs/src/index.md"
+           ]) do file
+               joinpath(path, file) |> ispath
+           end
        end
+INFO: Initializing git repository
+INFO: Generating src/TestRepo.jl
+INFO: Generating test/REQUIRE
+INFO: Generating docs/make.jl
+INFO: Generating docs/src/index.md
+INFO: Generating README.md
+INFO: Generating .travis.yml
+INFO: Generating test/runtests.jl
+INFO: Generating docs/.gitignore
+INFO: Generating .gitignore
+INFO: Generating LICENSE.md
+INFO: Generating REQUIRE
+INFO: Generating .codecov.yml
+INFO: Generating appveyor.yml
+INFO: Committing changes
 true
 ```
 """
@@ -43,7 +97,8 @@ generate_offline(package;
     authors = LibGit2.getconfig("user.name", ""),
     years = PkgDev.Generate.copyright_year(),
     user = PkgDev.GitHub.user(),
-    repo_name = string(package, ".jl")
+    repo_name = string(package, ".jl"),
+    appveyor_slug = default_appveyor_slug(repo_name)
 ) = begin
 
     if ispath(path)
@@ -51,7 +106,7 @@ generate_offline(package;
     end
 
     texts = Dict(
-        "README.md" => readme(user, package, repo_name),
+        "README.md" => readme(user, package, repo_name, appveyor_slug = appveyor_slug),
         "test/REQUIRE" => docs_require(),
         "test/runtests.jl" => tests(package, repo_name, authors),
         ".travis.yml" => travis(package),
@@ -90,38 +145,30 @@ generate_offline(package;
     repo
 end
 
-"""
-    PackageGenerator.generate_online(repo_name; ssh_keygen_file = "ssh-keygen")
-
-Only the online components of [`generate`](@ref) (see for more
-documentation)
-
-Set up a linked github and travis account for a certain repository.
-"""
-generate_online(repo_name;
+clean_up_failure(package;
+    path = joinpath(Pkg.Dir.path(), package),
     user = PkgDev.GitHub.user(),
+    repo_name = string(package, ".jl"),
     github_token = PkgDev.GitHub.token(),
-    travis_token = get_travis_token(github_token),
-    ssh_keygen_file = "ssh-keygen",
-    travis_sync_time = 20
+    appveyor_token = "",
+    appveyor_slug = default_appveyor_slug(repo_name)
 ) = begin
-
-    create_github_repo(github_token, repo_name)
-    sync_travis_to_github(user, travis_token, repo_name)
-    info("Waiting $travis_sync_time seconds for travis to sync")
-    sleep(travis_sync_time)
-    repository_id = get_travis_repo_info(user, travis_token, repo_name)["id"]
-    turn_on_travis_repo(travis_token, repository_id)
-
-    public_key, private_key = ssh_keygen(ssh_keygen_file)
-    create_github_deploy_key(user, github_token, repo_name, "documenter", public_key)
-    create_travis_env_var(travis_token, repository_id, "DOCUMENTER_KEY", private_key)
-
+    info("Removing local repository")
+    rm(path, recursive = true, force = true)
+    info("Removing github repository")
+    try_to_delete_github_repo(user, github_token, repo_name)
+    if appveyor_token != ""
+        try_to_delete_appveyor_project(user, appveyor_token, appveyor_slug)
+    end
     nothing
 end
 
+export generate
 """
-    PackageGenerator.generate(package; license = "MIT", ssh_keygen_file = "ssh-keygen")
+    generate(package;
+        license = "MIT",
+        ssh_keygen_file = "ssh-keygen",
+        appveyor_token = "")
 
 Generate a package named `package` with some nice bells and whistles.
 These include:
@@ -132,15 +179,23 @@ These include:
   - automatically syncs to changes on github
   - includes doctests as part of your package testing suite
 
-The package defaults to the "MIT" `license`. See `PkgDev` for other options.
+Of course, this means you need both a github and a travis account.
 
-`ssh-keygen` makes a pair of keys that allows travis to
-communicate with github. For Linux users with git installed, the default should
-be fine. For Windows users with git installed, try
-`ssh_keygen_path = "C:/Program Files/Git/usr/bin/ssh-keygen"`.
+The package defaults to the `"MIT"` `license`. See `PkgDev` for other options.
+
+`ssh-keygen` makes a pair of keys that allows Travis to
+communicate with Github. For Linux users with git installed, the default file
+should be fine. For Windows users with git installed, try
+`ssh_keygen_file = "C:/Program Files/Git/usr/bin/ssh-keygen"`.
+
+Your `appveyor_token` is available [here](https://ci.appveyor.com/api-token).
+Include the token in order to automatically turn on the appveyor for your repo.
 
 For `LibGit2.push` to work,
 follow the instructions [here](https://help.github.com/articles/connecting-to-github-with-ssh/)
+
+By default, tests will fail. Documentation will not build until tests
+pass.
 """
 generate(package;
     path = joinpath(Pkg.Dir.path(), package),
@@ -151,37 +206,52 @@ generate(package;
     repo_name = string(package, ".jl"),
     github_token = PkgDev.GitHub.token(),
     travis_token = get_travis_token(github_token),
+    appveyor_token = "",
+    appveyor_slug = default_appveyor_slug(repo_name),
     ssh_keygen_file = "ssh-keygen",
-    travis_sync_time = 20
+    sync_time = 60
 ) = begin
 
     if endswith(package, ".jl")
         error("Please provide package name without .jl")
     end
 
+    if ispath(path)
+        error("$path already exists. Remove and try again")
+    end
+
     try
+        appveyor_slug = generate_online(repo_name;
+            user = user,
+            github_token = github_token,
+            travis_token = travis_token,
+            appveyor_token = appveyor_token,
+            ssh_keygen_file = ssh_keygen_file,
+            sync_time = sync_time
+        )
+
         repo = generate_offline(package;
             path = path,
             license = license,
             authors = authors,
             years = years,
             user = user,
-            repo_name = repo_name
+            repo_name = repo_name,
+            appveyor_slug = appveyor_slug
         )
 
-        generate_online(repo_name;
-            user = user,
-            github_token = github_token,
-            travis_token = travis_token,
-            ssh_keygen_file = ssh_keygen_file,
-            travis_sync_time = travis_sync_time
-        )
-
-        info("Pushing changes")
+        info("Pushing repo to github")
         LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
-    catch
-        rm(path, recursive = true)
-        delete_github_repo(user, github_token, repo_name)
-        rethrow()
+    catch x
+        info("Ran into an error; cleaning up")
+        clean_up_failure(package;
+            path = path,
+            user = user,
+            repo_name = repo_name,
+            github_token = github_token,
+            appveyor_token = appveyor_token,
+            appveyor_slug = appveyor_slug
+        )
+        rethrow(x)
     end
 end
