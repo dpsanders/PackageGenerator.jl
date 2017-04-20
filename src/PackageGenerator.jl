@@ -3,7 +3,6 @@ module PackageGenerator
 import PkgDev
 import JSON
 import HTTP
-import FileIO
 
 include("utilities.jl")
 include("github.jl")
