@@ -1,7 +1,5 @@
 # PackageGenerator.jl
 
-Documentation for PackageGenerator.jl
-
 ```@index
 ```
 

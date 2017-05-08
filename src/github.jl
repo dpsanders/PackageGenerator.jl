@@ -29,9 +29,9 @@ try_to_delete_github_repo(user, token, repo_name) = begin
         status_exceptions = ("Forbidden", "Not Found") )
 
     if result == "Forbidden"
-        info("Your github token (likely) does not have admin privileges. Cannot delete repository (possibly during error cleanup)")
+        info("Your github token (likely) does not have admin privileges. Cannot delete repository $repo_name (possibly during error cleanup)")
     elseif result == "Not Found"
-        info("GitHub repo not found for deletion (possibly during error cleanup)")
+        info("GitHub repo $repo_name not found for deletion (possibly during error cleanup)")
     else
         result
     end

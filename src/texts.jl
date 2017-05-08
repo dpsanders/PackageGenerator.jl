@@ -29,7 +29,6 @@ readme(user, package, repo_name;
 tests(package, repo_name, authors) =
     """
     using $package
-    using Base.Test
 
     import Documenter
     Documenter.makedocs(
@@ -43,6 +42,8 @@ tests(package, repo_name, authors) =
         checkdocs = :exports,
         authors = "$authors"
     )
+
+    using Base.Test
 
     # write your own tests here
     @test 1 == 1
@@ -82,8 +83,6 @@ make(user, repo_name) =
 index(package) =
     """
     # $package.jl
-
-    Documentation for $package.jl
 
     ```@index
     ```

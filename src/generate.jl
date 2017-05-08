@@ -109,7 +109,6 @@ clean_up_failure(package;
 ) = begin
     info("Removing local repository")
     rm(path, recursive = true, force = true)
-    info("Removing github repository")
     try_to_delete_github_repo(user, github_token, repo_name)
     if appveyor_token != ""
         try_to_delete_appveyor_project(user, appveyor_token, appveyor_slug)
@@ -167,7 +166,7 @@ generate(package;
 ) = begin
 
     if endswith(package, ".jl")
-        error("Please provide package name without .jl")
+        error("Please provide package name $package without .jl")
     end
 
     if ispath(path)

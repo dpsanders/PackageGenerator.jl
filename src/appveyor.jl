@@ -15,7 +15,7 @@ turn_on_appveyor_repo(user, token, repo_name) = begin
     if any(appveyor_info) do project
         project["repositoryName"] == "$user/$repo_name"
     end
-        error("Appveyor project already exists for this repository")
+        error("Appveyor project $repo_name already exists for this repository")
     end
 
     info("Turning on AppVeyor repo")
@@ -30,11 +30,11 @@ turn_on_appveyor_repo(user, token, repo_name) = begin
 end
 
 try_to_delete_appveyor_project(user, token, slug) = begin
-    info("Deleting repository")
+    info("Attempting to delete appveyor repository")
     result = HTTP_wrapper(APPVEYOR_URL, "/api/projects/$user/$slug",
         request = HTTP.delete,
         headers = appveyor_token_header(token) )
     if result == """{"message":"Project not found or access denied."}"""
-        info("AppVeyor project not found (perhaps during error cleanup)")
+        info("AppVeyor project $slug not found (perhaps during error cleanup)")
     end
 end

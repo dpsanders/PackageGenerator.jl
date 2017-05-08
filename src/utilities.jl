@@ -2,15 +2,11 @@ HTTP_wrapper(url_pieces...;
     request = HTTP.get,
     token = "",
     body = Dict(),
-    activity = "",
     headers = Dict{String, String}(),
     status_exceptions = [],
     retry = 1
 ) = begin
 
-    if activity != ""
-        info(activity)
-    end
     headers_with_token = if token != ""
         merge(headers, Dict("Authorization" => "token $token") )
     else
@@ -32,7 +28,6 @@ HTTP_wrapper(url_pieces...;
                 request = request,
                 token = token,
                 body = body,
-                activity = activity,
                 headers = headers,
                 status_exceptions = status_exceptions,
                 retry = retry - 1
@@ -87,7 +82,7 @@ ssh_keygen(ssh_keygen_file) = mktempdir() do temp
             success(`$ssh_keygen_file -f $filename`)
         catch x
             if isa(x, Base.UVError)
-                error("Cannot find $ssh_keygen_file. See documentation of `PackageGenerator.generate` for platform specific recommendations")
+                error("Cannot find ssh_keygen_file $ssh_keygen_file. See documentation of `PackageGenerator.generate` for platform specific recommendations")
             else
                 rethrow()
             end

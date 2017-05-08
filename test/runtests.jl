@@ -1,5 +1,4 @@
 using PackageGenerator
-using Base.Test
 
 import Documenter
 Documenter.makedocs(
@@ -12,6 +11,3 @@ Documenter.makedocs(
     linkcheck = true,
     authors = "Brandon Taylor"
 )
-
-# write your own tests here
-@test 1 == 1

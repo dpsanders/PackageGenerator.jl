@@ -21,7 +21,7 @@ get_travis_repo_info(user, token, repo_name) = begin
     result = HTTP_wrapper(TRAVIS_URL, "/repos/$user/$repo_name",
         token = token)
     if isa(result, HTTP.FIFOBuffer)
-        error("Cannot find travis repository, perhaps due to incomplete syncing with GitHub. Try raising the `sync_time`")
+        error("Cannot find travis repository $repo_name, perhaps due to incomplete syncing with GitHub. Try raising the `sync_time`")
     else
         result
     end
