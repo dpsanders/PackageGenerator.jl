@@ -3,10 +3,7 @@
 [![travis badge][travis_badge]][travis_url]
 [![codecov badge][codecov_badge]][codecov_url]
 
-## Documentation
-
-- [**STABLE**][documenter_stable] &mdash; **most recently tagged version of the documentation.**
-- [**LATEST**][documenter_latest] &mdash; *in-development version of the documentation.*
+## Documentation [here][documenter_latest]
 
 [travis_badge]: https://travis-ci.org/bramtayl/PackageGenerator.jl.svg?branch=master
 [travis_url]: https://travis-ci.org/bramtayl/PackageGenerator.jl
