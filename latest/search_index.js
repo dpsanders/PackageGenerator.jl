@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.jl",
     "category": "section",
-    "text": "Documentation for PackageGenerator.jlModules = [PackageGenerator]"
+    "text": "Modules = [PackageGenerator]"
 },
 
 {
