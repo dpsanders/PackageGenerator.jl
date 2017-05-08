@@ -8,10 +8,9 @@ readme(user, package, repo_name;
     [![appveyor badge][appveyor_badge]][appveyor_url]
     [![codecov badge][codecov_badge]][codecov_url]
 
-    ## Documentation
+    ## Documentation [here][documenter_latest]
 
-    - [**STABLE**][documenter_stable] &mdash; **most recently tagged version of the documentation.**
-    - [**LATEST**][documenter_latest] &mdash; *in-development version of the documentation.*
+    Change documentation link to `documenter_stable` once published!
 
     [travis_badge]: https://travis-ci.org/$user/$repo_name.svg?branch=master
     [travis_url]: https://travis-ci.org/$user/$repo_name
