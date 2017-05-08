@@ -40,7 +40,10 @@ The desired name of the github repository
 ```
 github_token = PkgDev.GitHub.token()
 ```
-Your token to access the GitHub API
+Your token to access the GitHub API. The default token does not have permissions
+to delete repositories, which will cause a hiccup in the case of an error. Make
+your own with permission to delete repositories
+[here](https://github.com/settings/tokens)
 
 ```
 travis_token = get_travis_token(github_token)

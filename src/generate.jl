@@ -118,37 +118,45 @@ end
 
 export generate
 """
-    generate(package;
-        license = "MIT",
-        ssh_keygen_file = "ssh-keygen",
-        appveyor_token = "")
+    generate(package)
 
 Generate a package named `package` with some nice bells and whistles.
 These include:
 
 - a matching github repository
-- an activated repository on travis
+- an activated repository on travis (and optionally, an activated appveyor
+    project)
 - generated documentation that
   - automatically syncs to changes on github
   - includes doctests as part of your package testing suite
 
-Of course, this means you need both a github and a travis account.
+Of course, this means you need both a github and a travis account. If you
+haven't set up an ssh key for git, follow the instructions
+[here](https://help.github.com/articles/connecting-to-github-with-ssh/).
+
+Run in the REPL for best results. By default, tests will fail. Documentation
+will not build until tests pass.
+
+Several optional keywords exist: the most important ones are discussed below.
+
+    license = "MIT"
 
 The package defaults to the `"MIT"` `license`. See `PkgDev` for other options.
+
+    ssh_keygen_file = "ssh-keygen"
 
 `ssh-keygen` makes a pair of keys that allows Travis to
 communicate with Github. For Linux users with git installed, the default file
 should be fine. For Windows users with git installed, try
 `ssh_keygen_file = "C:/Program Files/Git/usr/bin/ssh-keygen"`.
 
+    appveyor_token = ""
+
 Your `appveyor_token` is available [here](https://ci.appveyor.com/api-token).
-Include the token in order to automatically turn on the appveyor for your repo.
+Include the token in order to automatically make an appveyor project for your
+repo.
 
-For `LibGit2.push` to work,
-follow the instructions [here](https://help.github.com/articles/connecting-to-github-with-ssh/)
-
-By default, tests will fail. Documentation will not build until tests
-pass.
+See documentation for more keyword options.
 """
 generate(package;
     path = joinpath(Pkg.Dir.path(), package),
