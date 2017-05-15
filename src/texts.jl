@@ -1,8 +1,10 @@
-readme(user, package, repo_name;
-    appveyor_slug = default_appveyor_slug(repo_name)
-) =
+readme(package) = begin
+    package_name = package.package_name
+    repo_name = package.repo_name
+    user_name = package.user_name
+    appveyor_slug = package.appveyor_slug
     """
-    # $package
+    # $package_name
 
     [![travis badge][travis_badge]][travis_url]
     [![appveyor badge][appveyor_badge]][appveyor_url]
@@ -10,28 +12,32 @@ readme(user, package, repo_name;
 
     ## Documentation [here][documenter_latest]
 
-    Change documentation link to `documenter_stable` once published!
+    Change documentation to link to `documenter_stable` once published!
 
-    [travis_badge]: https://travis-ci.org/$user/$repo_name.svg?branch=master
-    [travis_url]: https://travis-ci.org/$user/$repo_name
+    [travis_badge]: https://travis-ci.org/$user_name/$repo_name.svg?branch=master
+    [travis_url]: https://travis-ci.org/$user_name/$repo_name
 
-    [appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/$user/$repo_name?svg=true&branch=master
-    [appveyor_url]: https://ci.appveyor.com/project/$user/$appveyor_slug
+    [appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/$user_name/$repo_name?svg=true&branch=master
+    [appveyor_url]: https://ci.appveyor.com/project/$user_name/$appveyor_slug
 
-    [codecov_badge]: http://codecov.io/github/$user/$repo_name/coverage.svg?branch=master
-    [codecov_url]: http://codecov.io/github/$user/$repo_name?branch=master
+    [codecov_badge]: http://codecov.io/github/$user_name/$repo_name/coverage.svg?branch=master
+    [codecov_url]: http://codecov.io/github/$user_name/$repo_name?branch=master
 
-    [documenter_stable]: https://$user.github.io/$repo_name/stable
-    [documenter_latest]: https://$user.github.io/$repo_name/latest
+    [documenter_stable]: https://$user_name.github.io/$repo_name/stable
+    [documenter_latest]: https://$user_name.github.io/$repo_name/latest
     """
+end
 
-tests(package, repo_name, authors) =
+tests(package) = begin
+    package_name = package.package_name
+    repo_name = package.repo_name
+    authors = package.authors
     """
-    using $package
+    using $package_name
 
     import Documenter
     Documenter.makedocs(
-        modules = [$package],
+        modules = [$package_name],
         format = :html,
         sitename = "$repo_name",
         root = joinpath(dirname(dirname(@__FILE__)), "docs"),
@@ -47,8 +53,10 @@ tests(package, repo_name, authors) =
     # write your own tests here
     @test 1 == 1
     """
+end
 
-travis(package) =
+travis_yaml(package) = begin
+    package_name = package.package_name
     """
     # Documentation: http://docs.travis-ci.com/user/languages/julia/
     language: julia
@@ -62,34 +70,41 @@ travis(package) =
       email: false
     after_success:
     # build documentation
-      - julia -e 'cd(Pkg.dir("$package")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
+      - julia -e 'cd(Pkg.dir("$package_name")); Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
     # push coverage results to Codecov
-      - julia -e 'cd(Pkg.dir("$package")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+      - julia -e 'cd(Pkg.dir("$package_name")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
     """
+end
 
-make(user, repo_name) =
+make(package) = begin
+    user_name = package.user_name
+    repo_name = package.repo_name
+    github_url = package |> GitHub |> url
     """
     import Documenter
 
     Documenter.deploydocs(
-        repo = "github.com/$user/$repo_name.git",
+        repo = "$github_url",
         target = "build",
         deps = nothing,
         make = nothing
     )
     """
+end
 
-index(package) =
+index(package) = begin
+    package_name = package.package_name
     """
-    # $package.jl
+    # $package_name.jl
 
     ```@index
     ```
 
     ```@autodocs
-    Modules = [$package]
+    Modules = [$package_name]
     ```
     """
+end
 
 docs_gitignore() =
     """
@@ -102,9 +117,11 @@ docs_require() =
     Documenter
     """
 
-entrypoint(package) =
+entrypoint(package) = begin
+    package_name = package.package_name
+
     """
-    module $package
+    module $package_name
 
     ""\"
         test_function()
@@ -112,9 +129,9 @@ entrypoint(package) =
     Return 1
 
     ```jldoctest
-    julia> import $package
+    julia> import $package_name
 
-    julia> $package.test_function()
+    julia> $package_name.test_function()
     2
     ```
     ""\"
@@ -122,3 +139,13 @@ entrypoint(package) =
 
     end
     """
+end
+
+gitignore(package) = PkgDev.Generate.gitignore(package.path)
+license(package) = PkgDev.Generate.license(package.path,
+    package.license,
+    package.year,
+    package.authors)
+require(package) = PkgDev.Generate.require(package.path)
+codecov(package) = PkgDev.Generate.codecov(package.path)
+appveyor_yaml(package) = PkgDev.Generate.appveyor(package.path)

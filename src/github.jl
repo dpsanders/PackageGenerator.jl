@@ -1,38 +1,32 @@
-GITHUB_URL = "https://api.github.com"
+url(g::GitHub) = "https://github.com/$(g.user_name)/$(g.repo_name).git"
 
-create_github_repo(token, repo_name) = begin
+activate(g::GitHub) = begin
     info("Creating github repository")
-    HTTP_wrapper(
-        GITHUB_URL, "/user/repos",
-        request = HTTP.post,
-        token = token,
+    repo_name = g.repo_name
+
+    talk_to(
+        g, "/user/repos",
         body = Dict("name" => repo_name) )
 end
 
-create_github_deploy_key(user, token, repo_name, title, key; read_only = false) = begin
-    info("Creating github deploy key")
-    HTTP_wrapper(
-        GITHUB_URL, "/repos/$user/$repo_name/keys",
-        request = HTTP.post,
-        token = token,
-        body = Dict("title" => title,
+add_key(g::GitHub, key; name = ".documenter", read_only = false) = begin
+    info("Creating github deploy key $name")
+    user_name = g.user_name
+    repo_name = g.repo_name
+
+    talk_to(
+        g, "/repos/$user_name/$repo_name/keys",
+        body = Dict("title" => name,
             "key" => key,
             "read_only" => read_only) )
 end
 
-try_to_delete_github_repo(user, token, repo_name) = begin
-    info("Attempting to delete github repository")
-    result = HTTP_wrapper(
-        GITHUB_URL, "/repos/$user/$repo_name",
-        request = HTTP.delete,
-        token = token,
-        status_exceptions = ("Forbidden", "Not Found") )
+delete(g::GitHub) = begin
+    info("Deleting github repository")
+    user_name = g.user_name
+    repo_name = g.repo_name
 
-    if result == "Forbidden"
-        info("Your github token (likely) does not have admin privileges. Cannot delete repository $repo_name (possibly during error cleanup)")
-    elseif result == "Not Found"
-        info("GitHub repo $repo_name not found for deletion (possibly during error cleanup)")
-    else
-        result
-    end
+    talk_to(
+        g, "/repos/$user_name/$repo_name",
+        request = HTTP.delete)
 end

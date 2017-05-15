@@ -1,47 +1,47 @@
-TRAVIS_URL = "https://api.travis-ci.org"
-
 get_travis_token(github_token) = begin
     info("Getting travis token")
-    result = HTTP_wrapper(TRAVIS_URL, "/auth/github",
-        request = HTTP.post,
+    result = talk_to(Travis(), "/auth/github",
         headers = Dict("User-Agent" => "Travis/1.0"),
-        body = Dict("github_token" => github_token) )
+        body = Dict("github_token" => github_token) ) |> http_json
     result["access_token"]
 end
 
-sync_travis_to_github(user, token) = begin
+sync(t::Travis) = begin
     info("Syncing travis to github")
-    HTTP_wrapper(TRAVIS_URL, "/users/sync",
-        request = HTTP.post,
-        token = token)
+    talk_to(t, "/users/sync")
 end
 
-get_travis_repo_info(user, token, repo_name) = begin
+set_repo_code!(t::Travis) = begin
     info("Getting travis repo info")
-    result = HTTP_wrapper(TRAVIS_URL, "/repos/$user/$repo_name",
-        token = token)
-    if isa(result, HTTP.FIFOBuffer)
-        error("Cannot find travis repository $repo_name, perhaps due to incomplete syncing with GitHub. Try raising the `sync_time`")
+
+    user_name = t.user_name
+    repo_name = t.repo_name
+    answer = talk_to(t, "/repos/$user_name/$repo_name",
+        request = HTTP.get)
+    if answer.headers["Content-Type"] == "image/png"
+        error("Travis repository does not exist for $repo_name, perhaps due to incomplete syncing. Try raising `sync_time` with `update_configuration`")
     else
-        result
+        t.repo_code = http_json(answer)["id"]
     end
 end
 
-turn_on_travis_repo(token, repository_id) = begin
+activate(t::Travis) = begin
     info("Turning travis repository on")
-    HTTP_wrapper(TRAVIS_URL, "/hooks/$repository_id",
+    repo_code = t.repo_code
+
+    talk_to(t, "/hooks/$repo_code",
         request = HTTP.put,
-        token = token,
         body = Dict("hook" => Dict("active" => true) ) )
 end
 
-create_travis_env_var(token, repository_id, name, value; public = false) = begin
+
+add_key(t::Travis, key; name = "DOCUMENTER", public = false) = begin
     info("Submitting key to travis")
-    HTTP_wrapper(TRAVIS_URL, "/settings/env_vars?repository_id=$repository_id",
-        request = HTTP.post,
-        token = token,
+    repo_code = t.repo_code
+
+    talk_to(t, "/settings/env_vars?repository_id=$repo_code",
         body = Dict("env_var" => Dict(
             "name" => name,
-            "value" => value,
+            "value" => key,
             "public" => public)) )
 end
