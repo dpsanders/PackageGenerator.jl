@@ -35,7 +35,7 @@ activate(t::Travis) = begin
 end
 
 
-add_key(t::Travis, key; name = "DOCUMENTER", public = false) = begin
+add_key(t::Travis, key; name = "DOCUMENTER_KEY", public = false) = begin
     info("Submitting key to travis")
     repo_code = t.repo_code
 

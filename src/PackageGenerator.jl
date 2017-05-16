@@ -1,6 +1,5 @@
 module PackageGenerator
 
-import PkgDev
 import JSON
 import HTTP
 

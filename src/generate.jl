@@ -1,3 +1,34 @@
+write_texts(package) = begin
+    path = package.path
+
+    texts = Dict(
+        "LICENSE.md" => license(package),
+        "REQUIRE.md" => require(),
+        "README" => readme(package),
+
+        "src/$(package.package_name).jl" => entrypoint(package),
+
+        "test/REQUIRE" => docs_require(),
+        "test/runtests.jl" => tests(package),
+
+        "docs/make.jl" => make(package),
+        "docs/src/index.md" => index(package),
+        "docs/.gitignore" => docs_gitignore(),
+
+        ".travis.yml" => travis_yaml(package),
+        "appveyor.yml" => appveyor_yaml(package),
+        ".codecov" => codecov(),
+        ".gitignore" => gitignore()
+    )
+
+    for (file, text) in texts
+        full_path = joinpath(path, file)
+        info("Generating $file")
+        mkpath(dirname(full_path))
+        write(full_path, text)
+    end
+end
+
 delete(package) = begin
     created = package.created
     if "local repository" in created
@@ -16,21 +47,22 @@ export generate
 """
     generate(package::Package)
 
-Generate a package named `package` with some nice bells and whistles.
+Generate a [`Package`](@ref)` with some nice bells and whistles.
 These include:
 
 - a matching github repository
-- an activated repository on travis (and optionally, an activated appveyor
-    project)
+- testing with travis
+- testing with appveyor
 - generated documentation that
   - automatically syncs to changes on github
   - includes doctests as part of your package testing suite
 
-Of course, this means you need both a github and a travis account. If you
-haven't set up an ssh key for git, follow the instructions
+Of course, this means you need both a github, travis, and appveyor account.
+
+If you haven't set up an ssh key for git, follow the instructions
 [here](https://help.github.com/articles/connecting-to-github-with-ssh/).
 
-You must include a [`Package`](@ref)
+The license will be the MIT license. To change, use `PkgDev.Generate.license`
 """
 generate(package::Package) = begin
     try
@@ -76,36 +108,10 @@ generate(package::Package) = begin
         LibGit2.branch!(repo, "gh-pages")
         LibGit2.branch!(repo, "master")
 
-        texts = Dict(
-            "README.md" => readme(package),
-            "test/REQUIRE" => docs_require(),
-            "test/runtests.jl" => tests(package),
-            ".travis.yml" => travis_yaml(package),
-            "docs/make.jl" => make(package),
-            "docs/src/index.md" => index(package),
-            "docs/.gitignore" => docs_gitignore(),
-            "src/$(package.package_name).jl" => entrypoint(package)
-        )
-
-        for (file, text) in texts
-            full_path = joinpath(path, file)
-            info("Generating $file")
-            mkpath(dirname(full_path))
-            write(full_path, text)
-        end
-
-        original_files = [
-            gitignore(package),
-            license(package),
-            require(package),
-            codecov(package),
-            appveyor_yaml(package)
-        ]
-
-        files = ( keys(texts)..., original_files... )
+        write_texts(package)
 
         info("Committing changes")
-        LibGit2.add!(repo, files...)
+        LibGit2.add!(repo, keys(texts)...)
         LibGit2.commit(repo, "Generated files")
         LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
 

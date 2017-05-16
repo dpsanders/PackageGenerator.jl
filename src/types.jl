@@ -1,6 +1,5 @@
 type User
     package_directory
-    license
     authors
     user_name
     github_token
@@ -14,15 +13,13 @@ User(github_token, appveyor_token;
     ssh_keygen_file = "ssh-keygen",
     travis_token = get_travis_token(github_token),
     package_directory = Pkg.Dir.path(),
-    license = "MIT",
-    authors = LibGit2.getconfig("user.name", ""),
-    user_name = LibGit2.getconfig("github.user", ""),
+    authors = LibGit2.getconfig("user.name", "YOUR_NAME"),
+    user_name = LibGit2.getconfig("github.user", "YOUR_GITHUB_USER_NAME"),
     sync_time = 60
 ) = begin
 
     User(
         package_directory,
-        license,
         authors,
         user_name,
         github_token,
@@ -38,7 +35,6 @@ type Package
     package_name
     repo_name
     path
-    license
     authors
     year
     user_name
@@ -85,7 +81,6 @@ Package(package_name,
         package_name,
         repo_name,
         path,
-        user.license,
         user.authors,
         year,
         user.user_name,

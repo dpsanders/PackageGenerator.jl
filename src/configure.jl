@@ -55,10 +55,6 @@ A travis token can be generated automatically from your github token
 
 Where to put your new packages
 
-    license = "MIT"
-
-What license to use. See `PkgDev.jl` for more options.
-
     authors = LibGit2.getconfig("user.name", "")
 
 Who are the authors of your packages?
@@ -69,8 +65,7 @@ What is your github username?
 
     sync_time = 60
 
-How many seconds to wait for API calls to complete. 60 is overly cautious by
-design.
+How many seconds to wait for API calls to complete.
 """
 configure(args...; kwargs...) = User(args...; kwargs...) |> write
 
