@@ -15,3 +15,5 @@ fake_travis.repo_name = "fake"
 PackageGenerator.set_repo_code!(fake_travis)
 
 PackageGenerator.delete(package)
+
+write(user)

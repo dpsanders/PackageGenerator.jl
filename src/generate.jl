@@ -3,8 +3,8 @@ write_texts(package) = begin
 
     texts = Dict(
         "LICENSE.md" => license(package),
-        "REQUIRE.md" => require(),
-        "README" => readme(package),
+        "REQUIRE" => require(),
+        "README.md" => readme(package),
 
         "src/$(package.package_name).jl" => entrypoint(package),
 
@@ -38,6 +38,8 @@ write_texts(package) = begin
     info("Committing changes")
     LibGit2.add!(repo, keys(texts)...)
     LibGit2.commit(repo, "Generated files")
+
+    repo
 end
 
 delete(package) = begin
@@ -110,7 +112,7 @@ generate(package::Package) = begin
         mkdir(path)
         push!(created, "local repository")
 
-        write_texts(package)
+        repo = write_texts(package)
 
         LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
 
