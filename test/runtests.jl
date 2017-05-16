@@ -50,6 +50,7 @@ texts = (
     joinpath(path, file) |> ispath
 end
 
+@test_throws ErrorException generate(package)
 @test_throws ErrorException PackageGenerator.ssh_keygen("blah")
 
 rm(path, recursive = true)
