@@ -17,8 +17,6 @@ using Base.Test
 cfg = LibGit2.GitConfig(LibGit2.Consts.CONFIG_LEVEL_GLOBAL)
 old_name = LibGit2.getconfig("user.name", "")
 old_email = LibGit2.getconfig("user.email", "")
-LibGit2.set!(cfg, "user.name", "blah")
-LibGit2.set!(cfg, "user.email", "blah")
 
 if Pkg.Dir.path(".package_generator.json") |> ispath
     old_configuration = read(PackageGenerator.User)
@@ -27,51 +25,56 @@ else
     need_to_restore_configuration = false
 end
 
-configure("", "", travis_token = "")
-update_configuration(sync_time = 50)
+try
+    LibGit2.set!(cfg, "user.name", "blah")
+    LibGit2.set!(cfg, "user.email", "blah")
 
-package = "test_package" |> Package
-@test package.sync_time == 50
-@test_throws ErrorException Package("blah.jl")
+    configure("", "", travis_token = "")
+    update_configuration(sync_time = 50)
 
-@test PackageGenerator.GitHub(package).url == "https://api.github.com"
-@test PackageGenerator.Travis(package).url == "https://api.travis-ci.org"
-@test PackageGenerator.Travis().url == "https://api.travis-ci.org"
-@test PackageGenerator.AppVeyor(package).url == "https://ci.appveyor.com/"
+    package = "test_package" |> Package
+    @test package.sync_time == 50
+    @test_throws ErrorException Package("blah.jl")
 
-path = package.path
-mkpath(package.path)
-PackageGenerator.write_texts(package)
-texts = (
-    "LICENSE.md",
-    "REQUIRE",
-    "README.md",
-    "src/$(package.package_name).jl",
+    @test PackageGenerator.GitHub(package).url == "https://api.github.com"
+    @test PackageGenerator.Travis(package).url == "https://api.travis-ci.org"
+    @test PackageGenerator.Travis().url == "https://api.travis-ci.org"
+    @test PackageGenerator.AppVeyor(package).url == "https://ci.appveyor.com/"
 
-    "test/REQUIRE",
-    "test/runtests.jl",
+    path = package.path
+    mkpath(package.path)
+    PackageGenerator.write_texts(package)
+    texts = (
+        "LICENSE.md",
+        "REQUIRE",
+        "README.md",
+        "src/$(package.package_name).jl",
 
-    "docs/make.jl",
-    "docs/src/index.md",
-    "docs/.gitignore",
+        "test/REQUIRE",
+        "test/runtests.jl",
 
-    ".travis.yml",
-    "appveyor.yml",
-    ".codecov",
-    ".gitignore",
-)
-@test all(texts) do file
-    joinpath(path, file) |> ispath
-end
+        "docs/make.jl",
+        "docs/src/index.md",
+        "docs/.gitignore",
 
-@test_throws ErrorException generate(package)
-@test_throws ErrorException PackageGenerator.ssh_keygen("blah")
+        ".travis.yml",
+        "appveyor.yml",
+        ".codecov",
+        ".gitignore",
+    )
+    @test all(texts) do file
+        joinpath(path, file) |> ispath
+    end
 
-rm(path, recursive = true)
+    @test_throws ErrorException generate(package)
+    @test_throws ErrorException PackageGenerator.ssh_keygen("blah")
 
-LibGit2.set!(cfg, "user.name", old_name)
-LibGit2.set!(cfg, "user.email", old_email)
+    rm(path, recursive = true)
+finally
+    LibGit2.set!(cfg, "user.name", old_name)
+    LibGit2.set!(cfg, "user.email", old_email)
 
-if need_to_restore_configuration
-    write(old_configuration)
+    if need_to_restore_configuration
+        write(old_configuration)
+    end
 end
