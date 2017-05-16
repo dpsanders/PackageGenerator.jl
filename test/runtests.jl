@@ -20,6 +20,13 @@ old_email = LibGit2.getconfig("user.email", "")
 LibGit2.set!(cfg, "user.name", "blah")
 LibGit2.set!(cfg, "user.email", "blah")
 
+if Pkg.Dir.path(".package_generator.txt") |> ispath
+    old_configuration = read(PackageGenerator.User)
+    need_to_restore_configuration = true
+else
+    need_to_restore_configuration = false
+end
+
 configure("", "", travis_token = "")
 update_configuration(sync_time = 50)
 
@@ -64,3 +71,7 @@ rm(path, recursive = true)
 
 LibGit2.set!(cfg, "user.name", old_name)
 LibGit2.set!(cfg, "user.email", old_email)
+
+if need_to_restore_configuration
+    write(old_configuration)
+end
