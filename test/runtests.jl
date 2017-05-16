@@ -44,8 +44,8 @@ mkpath(package.path)
 PackageGenerator.write_texts(package)
 texts = (
     "LICENSE.md",
-    "REQUIRE.md",
-    "README",
+    "REQUIRE",
+    "README.md",
     "src/$(package.package_name).jl",
 
     "test/REQUIRE",
