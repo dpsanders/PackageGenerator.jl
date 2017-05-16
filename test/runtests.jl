@@ -13,6 +13,13 @@ Documenter.makedocs(
 
 using Base.Test
 
+# set up LibGit2
+cfg = LibGit2.GitConfig(LibGit2.Consts.CONFIG_LEVEL_GLOBAL)
+old_name = LibGit2.getconfig("user.name", "")
+old_email = LibGit2.getconfig("user.email", "")
+LibGit2.set!(cfg, "user.name", "blah")
+LibGit2.set!(cfg, "user.email", "blah")
+
 configure("", "", travis_token = "")
 update_configuration(sync_time = 50)
 
@@ -54,3 +61,6 @@ end
 @test_throws ErrorException PackageGenerator.ssh_keygen("blah")
 
 rm(path, recursive = true)
+
+LibGit2.set!(cfg, "user.name", old_name)
+LibGit2.set!(cfg, "user.email", old_email)
