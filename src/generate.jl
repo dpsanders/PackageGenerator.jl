@@ -23,7 +23,7 @@ write_texts(package) = begin
 
     info("Initializing git repository")
     repo = LibGit2.init(path)
-    LibGit2.set_remote_url(repo, url(github))
+    LibGit2.set_remote_url(repo, package |> GitHub |> url)
     LibGit2.commit(repo, "Initial empty commit")
     LibGit2.branch!(repo, "gh-pages")
     LibGit2.branch!(repo, "master")
@@ -76,6 +76,7 @@ If you haven't set up an ssh key for git, follow the instructions
 The license will be the MIT license. To change, use `PkgDev.Generate.license`
 """
 generate(package::Package) = begin
+    path = package.path
     if ispath(path)
         error("$path already exists. Please remove and try again")
     end
@@ -106,14 +107,8 @@ generate(package::Package) = begin
         push!(created, "appveyor project")
         package.appveyor_slug = appveyor.repo_code
 
-        path = package.path
-
-        if ispath(path)
-            error("$path already exists. Please remove and try again")
-        else
-            mkdir(path)
-            push!(created, "local repository")
-        end
+        mkdir(path)
+        push!(created, "local repository")
 
         write_texts(package)
 
