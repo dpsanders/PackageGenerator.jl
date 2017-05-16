@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.generate",
     "category": "Method",
-    "text": "generate(package::Package)\n\nGenerate a Package with some nice bells and whistles. These include:\n\na matching github repository\ntesting with travis\ntesting with appveyor\ngenerated documentation that\nautomatically syncs to changes on github\nincludes doctests as part of your package testing suite\n\nOf course, this means you need a github, travis, and an appveyor account.\n\nIf you haven't set up an ssh key for git, follow the instructions here.\n\nThe license will be the MIT license. To change, use PkgDev.Generate.license\n\n\n\n"
+    "text": "generate(package::Package)\n\nGenerate a Package with some nice bells and whistles. These include:\n\na matching github repository\ntesting with travis\ntesting with appveyor\ngenerated documentation that\nautomatically syncs to changes on github\nincludes doctests as part of your package testing suite\n\nOf course, this means you need github, travis, and appveyor accounts.\n\nIf you haven't set up an ssh key for git, follow the instructions here.\n\nThe license will be the MIT license. To change, use PkgDev.Generate.license\n\n\n\n"
 },
 
 {
@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.update_configuration",
     "category": "Method",
-    "text": "update_configuration(; kwargs)\n\nUpdate any of the user configurations discussed in configure.\n\n\n\n"
+    "text": "update_configuration(; kwargs...)\n\nUpdate any of the user configurations discussed in configure.\n\n\n\n"
 },
 
 {
