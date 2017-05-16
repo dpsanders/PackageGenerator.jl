@@ -50,9 +50,10 @@ end
 """
     Package(package_name)
 
-Generate a default package based on a package name. To customize you pacakge,
-you can edit any of its fields before `generate`ing it. The package will include
-all the fields discussed in [`configure`](@ref), `package_name`, as well as:
+Generate a default package based on a package name. To customize your package,
+you can edit any of its fields before [`generate`](@ref)ing it. The package will include
+all the fields discussed in [`configure`](@ref), `package_name`, as well as the
+following defaults (override with keyword arguments).
 
     repo_name = string(package_name, ".jl")
 

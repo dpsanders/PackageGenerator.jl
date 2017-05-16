@@ -60,7 +60,7 @@ export generate
 """
     generate(package::Package)
 
-Generate a [`Package`](@ref)` with some nice bells and whistles.
+Generate a [`Package`](@ref) with some nice bells and whistles.
 These include:
 
 - a matching github repository
@@ -70,7 +70,7 @@ These include:
   - automatically syncs to changes on github
   - includes doctests as part of your package testing suite
 
-Of course, this means you need both a github, travis, and appveyor account.
+Of course, this means you need a github, travis, and an appveyor account.
 
 If you haven't set up an ssh key for git, follow the instructions
 [here](https://help.github.com/articles/connecting-to-github-with-ssh/).

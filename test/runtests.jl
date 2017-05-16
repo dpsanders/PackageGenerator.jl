@@ -20,7 +20,7 @@ old_email = LibGit2.getconfig("user.email", "")
 LibGit2.set!(cfg, "user.name", "blah")
 LibGit2.set!(cfg, "user.email", "blah")
 
-if Pkg.Dir.path(".package_generator.txt") |> ispath
+if Pkg.Dir.path(".package_generator.json") |> ispath
     old_configuration = read(PackageGenerator.User)
     need_to_restore_configuration = true
 else

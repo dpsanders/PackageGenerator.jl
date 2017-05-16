@@ -1,4 +1,4 @@
-Base.read(::Type{User}, file = Pkg.Dir.path(".package_generator.txt") ) =
+Base.read(::Type{User}, file = Pkg.Dir.path(".package_generator.json") ) =
     if ispath(file)
         dict = JSON.parsefile(file, use_mmap = false)
         missings = setdiff(string.(fieldnames(User) ), keys(dict) )
@@ -14,7 +14,7 @@ Base.read(::Type{User}, file = Pkg.Dir.path(".package_generator.txt") ) =
         error("User settings configuration not found at $file. Please run `configure`")
     end
 
-Base.write(u::User; file = Pkg.Dir.path(".package_generator.txt") ) = begin
+Base.write(u::User; file = Pkg.Dir.path(".package_generator.json") ) = begin
     dict = Dict()
     for name in fieldnames(u)
         dict[name] = getfield(u, name)
@@ -28,12 +28,12 @@ export configure
 """
     configure(github_token, appveyor_token)
 
-Write out a user configuration file.
+Write out a user configuration file (`".package_generator.json"` in your package directory).
 
 Requires a `github_token`, which can be generated
 [here](https://github.com/settings/tokens/new). Make sure to check the
-"public_repo" and "delete_repo" scopes (if you want to be able to delete
-half-created repositories in case PackageGenerator hits an error).
+`"public_repo"` and `"delete_repo"` scopes (if you want to be able to delete
+half-created repositories in case `PackageGenerator` hits an error).
 
 Also requires an `appveyor_token`, which can be found
 [here](https://ci.appveyor.com/api-token)
