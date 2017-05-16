@@ -1,4 +1,4 @@
-url(g::GitHub) = "https://github.com/$(g.user_name)/$(g.repo_name).git"
+url(g::GitHub) = "github.com/$(g.user_name)/$(g.repo_name).git"
 
 activate(g::GitHub) = begin
     info("Creating github repository")

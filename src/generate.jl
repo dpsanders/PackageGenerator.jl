@@ -23,7 +23,7 @@ write_texts(package) = begin
 
     info("Initializing git repository")
     repo = LibGit2.init(path)
-    LibGit2.set_remote_url(repo, package |> GitHub |> url)
+    LibGit2.set_remote_url(repo, "https://" * (package |> GitHub |> url) )
     LibGit2.commit(repo, "Initial empty commit")
     LibGit2.branch!(repo, "gh-pages")
     LibGit2.branch!(repo, "master")
