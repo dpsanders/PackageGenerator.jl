@@ -4,7 +4,7 @@ user = read(PackageGenerator.User)
 configure(user.github_token, user.appveyor_token)
 update_configuration(ssh_keygen_file = "C:/Program Files/Git/usr/bin/ssh-keygen")
 
-package = "NewTestPackage10" |> Package |> generate
+package = "TestPackage" |> Package |> generate
 
 # should error
 package |> PackageGenerator.AppVeyor |> PackageGenerator.check
