@@ -1,19 +1,26 @@
 using PackageGenerator
 
 user = read(PackageGenerator.User)
-configure(user.github_token, user.appveyor_token)
-update_configuration(ssh_keygen_file = "C:/Program Files/Git/usr/bin/ssh-keygen")
+package_was_created = false
 
-package = "TestPackage" |> Package |> generate
+try
+    configure(user.github_token, user.appveyor_token;
+        ssh_keygen_file = user.ssh_keygen_file)
 
-# should error
-package |> PackageGenerator.AppVeyor |> PackageGenerator.check
+    package = "TestPackage" |> Package |> generate
+    package_was_created = true
 
-fake_travis = package |> PackageGenerator.Travis
-fake_travis.repo_name = "fake"
-# should error reasonably
-PackageGenerator.set_repo_code!(fake_travis)
+    # should error
+    @test_throws ErrorException package |> PackageGenerator.AppVeyor |> PackageGenerator.check
 
-PackageGenerator.delete(package)
+    fake_travis = package |> PackageGenerator.Travis
+    fake_travis.repo_name = "fake"
+    # should error reasonably
+    @test_throws ErrorException PackageGenerator.set_repo_code!(fake_travis)
 
-write(user)
+finally
+    if package_was_created
+        PackageGenerator.delete(package)
+    end
+    write(user)
+end
