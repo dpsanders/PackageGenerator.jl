@@ -66,7 +66,7 @@ readme(package) = begin
 
     ## Documentation [here][documenter_latest]
 
-    Change documentation to link to `documenter_stable` once published!
+    Change documentation link to `documenter_stable` once published!
 
     [travis_badge]: https://travis-ci.org/$user_name/$repo_name.svg?branch=master
     [travis_url]: https://travis-ci.org/$user_name/$repo_name

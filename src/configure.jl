@@ -71,7 +71,7 @@ configure(args...; kwargs...) = User(args...; kwargs...) |> write
 
 export update_configuration
 """
-    update_configuration(; kwargs)
+    update_configuration(; kwargs...)
 
 Update any of the user configurations discussed in [`configure`](@ref).
 """
