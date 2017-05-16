@@ -21,12 +21,23 @@ write_texts(package) = begin
         ".gitignore" => gitignore()
     )
 
+    info("Initializing git repository")
+    repo = LibGit2.init(path)
+    LibGit2.set_remote_url(repo, url(github))
+    LibGit2.commit(repo, "Initial empty commit")
+    LibGit2.branch!(repo, "gh-pages")
+    LibGit2.branch!(repo, "master")
+
     for (file, text) in texts
         full_path = joinpath(path, file)
         info("Generating $file")
         mkpath(dirname(full_path))
         write(full_path, text)
     end
+
+    info("Committing changes")
+    LibGit2.add!(repo, keys(texts)...)
+    LibGit2.commit(repo, "Generated files")
 end
 
 delete(package) = begin
@@ -65,6 +76,9 @@ If you haven't set up an ssh key for git, follow the instructions
 The license will be the MIT license. To change, use `PkgDev.Generate.license`
 """
 generate(package::Package) = begin
+    if ispath(path)
+        error("$path already exists. Please remove and try again")
+    end
     try
         sync_time = package.sync_time
         created = package.created
@@ -101,18 +115,8 @@ generate(package::Package) = begin
             push!(created, "local repository")
         end
 
-        info("Initializing git repository")
-        repo = LibGit2.init(path)
-        LibGit2.set_remote_url(repo, url(github))
-        LibGit2.commit(repo, "Initial empty commit")
-        LibGit2.branch!(repo, "gh-pages")
-        LibGit2.branch!(repo, "master")
-
         write_texts(package)
 
-        info("Committing changes")
-        LibGit2.add!(repo, keys(texts)...)
-        LibGit2.commit(repo, "Generated files")
         LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])
 
         package
