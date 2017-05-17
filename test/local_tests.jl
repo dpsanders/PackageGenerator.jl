@@ -1,26 +1,17 @@
 using PackageGenerator
 
-user = read(PackageGenerator.User)
-package_was_created = false
+package = "TestPackage" |> Package
 
 try
-    configure(user.github_token, user.appveyor_token;
-        ssh_keygen_file = user.ssh_keygen_file)
+    package.github_token |> PackageGenerator.get_travis_token
 
-    package = "TestPackage" |> Package |> generate
-    package_was_created = true
+    generate(package)
 
-    # should error
     @test_throws ErrorException package |> PackageGenerator.AppVeyor |> PackageGenerator.check
 
     fake_travis = package |> PackageGenerator.Travis
     fake_travis.repo_name = "fake"
-    # should error reasonably
     @test_throws ErrorException PackageGenerator.set_repo_code!(fake_travis)
-
 finally
-    if package_was_created
-        PackageGenerator.delete(package)
-    end
-    write(user)
+    PackageGenerator.delete(package)
 end
