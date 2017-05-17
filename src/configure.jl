@@ -55,11 +55,11 @@ A travis token can be generated automatically from your github token
 
 Where to put your new packages
 
-    authors = LibGit2.getconfig("user.name", "")
+    authors = LibGit2.getconfig("user.name", "YOUR_NAME")
 
 Who are the authors of your packages?
 
-    user_name = LibGit2.getconfig("github.user", "")
+    user_name = LibGit2.getconfig("github.user", "YOUR_GITHUB_USER_NAME")
 
 What is your github username?
 
