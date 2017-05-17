@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.jl",
     "category": "section",
-    "text": "Modules = [PackageGenerator]"
+    "text": "Modules = [PackageGenerator]If you would like to run tests locally, first configure then try running tests/local_tests.jl (and report any errors!). This will test parts of the package that are not tested through CI."
 },
 
 ]}
