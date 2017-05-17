@@ -1,4 +1,4 @@
-Base.read(::Type{User}, file = Pkg.Dir.path(".package_generator.json") ) =
+Base.read(::Type{User}; file = Pkg.Dir.path(".package_generator.json") ) =
     if ispath(file)
         dict = JSON.parsefile(file, use_mmap = false)
         missings = setdiff(string.(fieldnames(User) ), keys(dict) )
@@ -8,7 +8,7 @@ Base.read(::Type{User}, file = Pkg.Dir.path(".package_generator.json") ) =
             end
             User(parts_in_order...)
         else
-            error("Missing user configuration settings $(missings...). Please run `configure`")
+            error("Missing user configuration settings $missings. Please run `configure`")
         end
     else
         error("User settings configuration not found at $file. Please run `configure`")

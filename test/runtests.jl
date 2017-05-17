@@ -13,6 +13,15 @@ Documenter.makedocs(
 
 using Base.Test
 
+@test_throws ErrorException PackageGenerator.ssh_keygen("blah")
+
+@test_throws ErrorException read(PackageGenerator.User, file = "blah")
+temp_config = tempname()
+open(temp_config, "w") do io
+    print(io, """{"sync_time":60}""")
+end
+@test_throws ErrorException read(PackageGenerator.User, file = temp_config)
+
 # set up LibGit2
 cfg = LibGit2.GitConfig(LibGit2.Consts.CONFIG_LEVEL_GLOBAL)
 old_name = LibGit2.getconfig("user.name", "")
@@ -67,7 +76,6 @@ try
     end
 
     @test_throws ErrorException generate(package)
-    @test_throws ErrorException PackageGenerator.ssh_keygen("blah")
 
     rm(path, recursive = true)
 finally
