@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "PackageGenerator.Package",
     "category": "Type",
-    "text": "Package(package_name)\n\nGenerate a default package based on a package name. To customize your package, you can edit any of its fields before generateing it. The package will include all the fields discussed in configure, package_name, as well as the following defaults (override with keyword arguments).\n\nrepo_name = string(package_name, \".jl\")\n\nThe name of your repository on github.\n\nyear = string(Dates.year(Dates.today()))\n\nThe copyright year. Defaults to the current year.\n\n\n\n"
+    "text": "Package(package_name)\n\nGenerate a default package based on a package name. To customize your package, you can edit any of its fields before generateing it. The package will include all the fields discussed in configure, package_name, as well as the following defaults (override with keyword arguments).\n\nrepo_name = package_name * \".jl\"\n\nThe name of your repository on github.\n\nyear = Dates.today() |> Dates.year\n\nThe copyright year. Defaults to the current year.\n\n\n\n"
 },
 
 {
