@@ -55,17 +55,17 @@ you can edit any of its fields before [`generate`](@ref)ing it. The package will
 all the fields discussed in [`configure`](@ref), `package_name`, as well as the
 following defaults (override with keyword arguments).
 
-    repo_name = string(package_name, ".jl")
+    repo_name = package_name * ".jl"
 
 The name of your repository on github.
 
-    year = string(Dates.year(Dates.today()))
+    year = Dates.today() |> Dates.year
 
 The copyright year. Defaults to the current year.
 """
 Package(package_name,
-    repo_name = string(package_name, ".jl"),
-    year = string(Dates.year(Dates.today())),
+    repo_name = package_name * ".jl",
+    year = Dates.today() |> Dates.year
 ) = begin
 
     if endswith(package_name, ".jl")
