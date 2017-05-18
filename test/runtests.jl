@@ -22,12 +22,9 @@ open(temp_config, "w") do io
 end
 @test_throws ErrorException read(PackageGenerator.User, file = temp_config)
 
-# set up LibGit2
-cfg = LibGit2.GitConfig(LibGit2.Consts.CONFIG_LEVEL_GLOBAL)
-old_name = LibGit2.getconfig("user.name", "")
-old_email = LibGit2.getconfig("user.email", "")
+config_path = Pkg.Dir.path(".package_generator.json")
 
-if Pkg.Dir.path(".package_generator.json") |> ispath
+if config_path |> ispath
     old_configuration = read(PackageGenerator.User)
     need_to_restore_configuration = true
 else
@@ -35,9 +32,6 @@ else
 end
 
 try
-    LibGit2.set!(cfg, "user.name", "blah")
-    LibGit2.set!(cfg, "user.email", "blah")
-
     configure("", "", travis_token = "")
     update_configuration(sync_time = 50)
 
@@ -79,10 +73,9 @@ try
 
     rm(path, recursive = true)
 finally
-    LibGit2.set!(cfg, "user.name", old_name)
-    LibGit2.set!(cfg, "user.email", old_email)
-
     if need_to_restore_configuration
         write(old_configuration)
+    else
+        rm(config_path)
     end
 end
