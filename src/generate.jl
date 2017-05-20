@@ -28,6 +28,8 @@ write_texts(package) = begin
         write(full_path, text)
     end
 
+    keys(texts)
+
 end
 
 delete(package) = begin
@@ -107,10 +109,10 @@ generate(package::Package) = begin
         LibGit2.branch!(repo, "gh-pages")
         LibGit2.branch!(repo, "master")
 
-        write_texts(package)
+        texts = write_texts(package)
 
         info("Committing changes")
-        LibGit2.add!(repo, keys(texts)...)
+        LibGit2.add!(repo, texts...)
         LibGit2.commit(repo, "Generated files")
 
         LibGit2.push(repo, refspecs=["refs/heads/master", "refs/heads/gh-pages"])

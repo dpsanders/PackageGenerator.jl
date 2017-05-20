@@ -1,4 +1,5 @@
 using PackageGenerator
+using Base.Test
 
 package = "TestPackage" |> Package
 
