@@ -1,4 +1,6 @@
-Base.read(::Type{User}; file = Pkg.Dir.path(".package_generator.json") ) =
+configuration_file = Pkg.Dir.path("PackageGenerator", ".package_generator.json")
+
+Base.read(::Type{User}; file = configuration_file) =
     if ispath(file)
         dict = JSON.parsefile(file, use_mmap = false)
         missings = setdiff(string.(fieldnames(User) ), keys(dict) )
@@ -14,7 +16,7 @@ Base.read(::Type{User}; file = Pkg.Dir.path(".package_generator.json") ) =
         error("User settings configuration not found at $file. Please run `configure`")
     end
 
-Base.write(u::User; file = Pkg.Dir.path(".package_generator.json") ) = begin
+Base.write(u::User; file = configuration_file) = begin
     dict = Dict()
     for name in fieldnames(u)
         dict[name] = getfield(u, name)

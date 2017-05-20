@@ -22,7 +22,7 @@ open(temp_config, "w") do io
 end
 @test_throws ErrorException read(PackageGenerator.User, file = temp_config)
 
-config_path = Pkg.Dir.path(".package_generator.json")
+config_path = PackageGenerator.configuration_file
 
 if config_path |> ispath
     old_configuration = read(PackageGenerator.User)
