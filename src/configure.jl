@@ -1,4 +1,20 @@
-configuration_file = Pkg.Dir.path("PackageGenerator", ".package_generator.json")
+configuration_file = joinpath((@__FILE__) |> dirname |> dirname, ".package_generator.json")
+
+function joinpath(a::String, b::String)
+    isabspath(b) && return b
+    A, a = splitdrive(a)
+    B, b = splitdrive(b)
+    !isempty(B) && A != B && throw(ArgumentError("drive mismatch: $A$a $B$b"))
+    C = isempty(B) ? A : B
+    isempty(a)                             ? string(C,b) :
+    ismatch(path_separator_re, a[end:end]) ? string(C,a,b) :
+                                             string(C,a,pathsep(a,b),b)
+end
+Base.path_separator_re
+Base.pathsep(a, b)
+
+Pkg.Dir.path(".package_generator.json")
+joinpath(P"text.json")
 
 Base.read(::Type{User}; file = configuration_file) =
     if ispath(file)
