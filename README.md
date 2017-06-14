@@ -13,3 +13,10 @@
 
 [documenter_stable]: https://bramtayl.github.io/PackageGenerator.jl/stable
 [documenter_latest]: https://bramtayl.github.io/PackageGenerator.jl/latest
+
+## Basic usage instructions   
+
+- Get GitHub and Appveyor tokens (see instructions [here](https://bramtayl.github.io/PackageGenerator.jl/latest/index.html#PackageGenerator.configure-Tuple))
+- `PackageGenerator.configure(github_token, appveyor_token)`
+- `p = Package("my_package_name")`
+- `PackageGenerator.generate(p)`
